@@ -1,0 +1,34 @@
+# JNTUScrapTool — Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# ── HTTP & Scraping ──────────────────────────────────────────
+requests>=2.31.0              # HTTP client
+beautifulsoup4>=4.12.0        # HTML parsing
+lxml>=4.9.0                   # Fast XML/HTML parser (BS4 backend)
+fake-useragent>=1.4.0         # Random user-agent strings
+urllib3>=2.0.0                # Retry adapter support
+
+# ── Browser Automation (JS rendering fallback) ───────────────
+selenium>=4.18.0
+undetected-chromedriver>=3.5.5
+
+# ── Data & Storage ───────────────────────────────────────────
+pandas>=2.1.0                 # CSV/DataFrame export
+SQLAlchemy>=2.0.0             # ORM for SQLite/PostgreSQL
+aiosqlite>=0.19.0             # Async SQLite support
+
+# ── CLI ──────────────────────────────────────────────────────
+typer[all]>=0.12.0            # CLI framework with rich output
+rich>=13.7.0                  # Pretty terminal output
+
+# ── Async & Concurrency ──────────────────────────────────────
+aiohttp>=3.9.0                # Async HTTP (Phase 2+)
+aiofiles>=23.2.0              # Async file I/O
+
+# ── API (Phase 6+) ───────────────────────────────────────────
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+
+# ── Utilities ────────────────────────────────────────────────
+python-dotenv>=1.0.0          # Environment variable support
+tqdm>=4.66.0                  # Progress bars

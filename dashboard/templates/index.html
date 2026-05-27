@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JNTUScrapTool — Control Center</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <div class="app">
+
+        <!-- ══════════════════ HEADER ══════════════════ -->
+        <header class="header">
+            <div class="header-brand">
+                <div class="header-logo">J</div>
+                <div>
+                    <div class="header-title">JNTUScrapTool</div>
+                    <div class="header-sub">Academic PDF Scraper &amp; Search Engine</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="ws-badge">
+                    <div id="ws-dot" class="ws-dot"></div>
+                    <span>Live</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span id="status-dot" class="status-dot idle"></span>
+                    <span id="system-status-text">Idle</span>
+                </div>
+                <span id="live-clock">--:--:--</span>
+            </div>
+        </header>
+
+        <!-- ══════════════════ MAIN GRID ══════════════════ -->
+        <div class="main">
+
+            <!-- ▌LEFT COLUMN ▌ -->
+            <div class="left-col">
+
+                <!-- ── MASTER CONTROLS ───────────────────────── -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>⚡ Master Controls</span>
+                        <span style="color:var(--orange);font-size:11px;" id="elapsed">—</span>
+                    </div>
+                    <div class="card-body">
+                        <button id="master-run-btn" class="master-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                            RUN FULL JNTU SCRAPE
+                        </button>
+
+                        <!-- Phase buttons -->
+                        <div class="phase-btns">
+                            <button id="phase-btn-1" class="phase-btn">Phase 1<br><span
+                                    style="color:var(--text-muted)">Homepage</span></button>
+                            <button id="phase-btn-2" class="phase-btn">Phase 2<br><span
+                                    style="color:var(--text-muted)">Categories</span></button>
+                            <button id="phase-btn-3" class="phase-btn">Phase 3<br><span
+                                    style="color:var(--text-muted)">Posts</span></button>
+                            <button id="phase-btn-4" class="phase-btn">Phase 4<br><span
+                                    style="color:var(--text-muted)">Download</span></button>
+                            <button id="phase-btn-5" class="phase-btn">Phase 5<br><span
+                                    style="color:var(--text-muted)">Metadata</span></button>
+                            <button id="phase-btn-6" class="phase-btn">Phase 6<br><span
+                                    style="color:var(--text-muted)">Database</span></button>
+                        </div>
+
+                        <!-- Pause / Resume / Stop -->
+                        <div class="control-btns" style="margin-top:14px;">
+                            <button id="btn-pause" class="ctrl-btn pause">⏸ Pause</button>
+                            <button id="btn-resume" class="ctrl-btn resume">▶ Resume</button>
+                            <button id="btn-stop" class="ctrl-btn stop">⏹ Stop</button>
+                        </div>
+
+                        <!-- Utility actions -->
+                        <div class="util-btns">
+                            <a href="/search" target="_blank" class="util-btn">🔍 Open Search Portal</a>
+                            <a href="/api/stats" target="_blank" class="util-btn">📊 Export Stats JSON</a>
+                            <a href="/api/logs/download" target="_blank" class="util-btn">📄 Download Log</a>
+                            <button class="util-btn" onclick="window.open('/api/analytics','_blank')">🗃
+                                Analytics</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── GLOBAL PROGRESS ───────────────────────── -->
+                <div class="card">
+                    <div class="card-header">📊 Overall Progress</div>
+                    <div class="global-progress">
+                        <div class="global-pct" id="global-pct-text">0.0%</div>
+                        <div class="global-bar-wrap">
+                            <div id="global-bar" class="global-bar"></div>
+                        </div>
+                        <div class="global-label">Full pipeline completion</div>
+                    </div>
+
+                    <!-- Per-phase bars -->
+                    <div class="phase-rows">
+                        {% for ph, label in [(1,"Homepage + Navbar"),(2,"Category Crawl"),(3,"Post Extraction"),(4,"PDF
+                        Download"),(5,"Metadata Engine"),(6,"Database Builder")] %}
+                        <div class="phase-row">
+                            <div class="phase-name">Phase {{ph}} — {{label}}</div>
+                            <div class="phase-bar-wrap">
+                                <div id="phase-bar-{{ph}}" class="phase-bar idle"></div>
+                            </div>
+                            <div class="phase-pct" id="phase-pct-{{ph}}">0%</div>
+                            <span id="phase-badge-{{ph}}" class="phase-status-badge idle">idle</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- ── LIVE STATUS COUNTERS ───────────────────── -->
+                <div class="card">
+                    <div class="card-header">📡 Live Status</div>
+                    <div class="counters-grid">
+                        <div class="counter-card highlight">
+                            <div class="counter-val" id="cnt-dl">0</div>
+                            <div class="counter-label">PDFs Downloaded</div>
+                        </div>
+                        <div class="counter-card good">
+                            <div class="counter-val" id="cnt-posts">0</div>
+                            <div class="counter-label">Posts Found</div>
+                        </div>
+                        <div class="counter-card">
+                            <div class="counter-val" id="cnt-cats">0</div>
+                            <div class="counter-label">Categories</div>
+                        </div>
+                        <div class="counter-card">
+                            <div class="counter-val" id="cnt-links">0</div>
+                            <div class="counter-label">Links Found</div>
+                        </div>
+                        <div class="counter-card">
+                            <div class="counter-val" id="cnt-fpages">0</div>
+                            <div class="counter-label">File Pages</div>
+                        </div>
+                        <div class="counter-card">
+                            <div class="counter-val" id="cnt-pdfs">0</div>
+                            <div class="counter-label">PDFs Resolved</div>
+                        </div>
+                        <div class="counter-card bad">
+                            <div class="counter-val" id="cnt-failed">0</div>
+                            <div class="counter-label">Failed</div>
+                        </div>
+                        <div class="counter-card">
+                            <div class="counter-val" id="cnt-dup">0</div>
+                            <div class="counter-label">Duplicates</div>
+                        </div>
+                        <div class="counter-card highlight">
+                            <div class="counter-val" id="cnt-storage">0 B</div>
+                            <div class="counter-label">Storage Used</div>
+                        </div>
+                        <div class="counter-card">
+                            <div class="counter-val" id="cnt-speed">0 MB/s</div>
+                            <div class="counter-label">Speed</div>
+                        </div>
+                        <div class="counter-card">
+                            <div class="counter-val" id="cnt-eta">—</div>
+                            <div class="counter-label">ETA</div>
+                        </div>
+                        <div class="counter-card good">
+                            <div class="counter-val" id="db-records">0</div>
+                            <div class="counter-label">DB Records</div>
+                        </div>
+                    </div>
+                    <div class="url-ticker" id="url-ticker">—</div>
+                </div>
+
+                <!-- ── LOG VIEWER ─────────────────────────────── -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>🖥 Live Logs</span>
+                        <div style="display:flex;gap:6px;">
+                            <button class="phase-btn active" data-log-phase="live"
+                                style="padding:4px 10px;font-size:10px;">Live</button>
+                            <button class="phase-btn" data-log-phase="1"
+                                style="padding:4px 10px;font-size:10px;">P1</button>
+                            <button class="phase-btn" data-log-phase="2"
+                                style="padding:4px 10px;font-size:10px;">P2</button>
+                            <button class="phase-btn" data-log-phase="3"
+                                style="padding:4px 10px;font-size:10px;">P3</button>
+                            <button class="phase-btn" data-log-phase="4"
+                                style="padding:4px 10px;font-size:10px;">P4</button>
+                            <button class="phase-btn" data-log-phase="5"
+                                style="padding:4px 10px;font-size:10px;">P5</button>
+                            <button class="phase-btn" data-log-phase="6"
+                                style="padding:4px 10px;font-size:10px;">P6</button>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding:12px;">
+                        <div id="log-viewer" class="log-viewer">
+                            <div class="log-line phase">▶ JNTUScrapTool Control Center ready. Click RUN to begin.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /left-col -->
+
+            <!-- ▌RIGHT COLUMN ▌ -->
+            <div class="right-col">
+
+                <!-- ── DOWNLOAD STATS ─────────── -->
+                <div class="card">
+                    <div class="card-header">📥 Download Stats</div>
+                    <div class="stat-row">
+                        <div class="stat-item">
+                            <span class="stat-key">✓ Successful</span>
+                            <span class="stat-value" style="color:var(--green)" id="dl-success">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-key">✗ Failed</span>
+                            <span class="stat-value" style="color:var(--red)" id="dl-failed">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-key">⊙ Duplicate</span>
+                            <span class="stat-value" style="color:var(--yellow)" id="dl-dup">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-key">⚠ Invalid</span>
+                            <span class="stat-value" style="color:var(--text-dim)" id="dl-invalid">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-key">📦 Total Size</span>
+                            <span class="stat-value" style="color:var(--orange)" id="total-storage">0 B</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-key">📄 Total Files</span>
+                            <span class="stat-value" id="total-files">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-key">⬇ Current File</span>
+                            <span class="stat-value" id="current-file"
+                                style="font-size:10px;color:var(--text-dim);word-break:break-all;max-width:180px;text-align:right;">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── STORAGE OVERVIEW ───────── -->
+                <div class="card">
+                    <div class="card-header">🗂 Storage Overview</div>
+                    <div class="card-body" style="padding:0 18px 14px;">
+                        <table class="storage-table">
+                            <thead>
+                                <tr>
+                                    <th>University</th>
+                                    <th>Category</th>
+                                    <th>Files</th>
+                                </tr>
+                            </thead>
+                            <tbody id="storage-tbody">
+                                <tr>
+                                    <td colspan="3" style="color:var(--text-muted);text-align:center;padding:16px;">No
+                                        data yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ── QUICK SEARCH ───────────── -->
+                <div class="card">
+                    <div class="card-header">🔍 Quick Search</div>
+                    <div class="card-body">
+                        <div class="quick-search">
+                            <input type="text" id="quick-search-input" placeholder="Subject, regulation, semester…">
+                            <button id="quick-search-btn">Go</button>
+                        </div>
+                        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">
+                            {% for label, q in
+                            [("R23","R23"),("R20","R20"),("1-1","1-1"),("2-1","2-1"),("JNTUK","JNTUK"),("Calendars","Academic
+                            Calendar"),("Q-Papers","Question Papers")] %}
+                            <span onclick="window.open('/search?q={{q}}','_blank')"
+                                style="cursor:pointer;padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--text-dim);transition:all .2s;"
+                                onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'"
+                                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">{{label}}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SYSTEM INFO ─────────────── -->
+                <div class="card">
+                    <div class="card-header">ℹ System</div>
+                    <div class="stat-row">
+                        <div class="stat-item">
+                            <span class="stat-key">Run Command</span>
+                            <span class="stat-value" style="font-size:11px;">python main.py dashboard</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-key">Local URL</span>
+                            <span class="stat-value" style="font-size:11px;">http://127.0.0.1:8000</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-key">DB Records</span>
+                            <span class="stat-value" id="db-records-2">—</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /right-col -->
+        </div><!-- /main -->
+    </div><!-- /app -->
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+
+</html>

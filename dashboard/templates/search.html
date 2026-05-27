@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JNTU Academic Search Portal</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .search-hero {
+            background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 48px 28px;
+            text-align: center;
+        }
+
+        .search-hero h1 {
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: -.5px;
+        }
+
+        .search-hero h1 span {
+            color: var(--orange);
+        }
+
+        .search-hero p {
+            color: var(--text-dim);
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            max-width: 680px;
+            margin: 28px auto 0;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--orange);
+        }
+
+        .search-box button {
+            padding: 14px 28px;
+            background: var(--orange);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .search-box button:hover {
+            background: #ff8c2a;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            max-width: 680px;
+            margin: 16px auto 0;
+            justify-content: center;
+        }
+
+        .filter-select {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color .2s;
+        }
+
+        .filter-select:focus {
+            border-color: var(--orange);
+        }
+
+        .results-area {
+            max-width: 960px;
+            margin: 30px auto;
+            padding: 0 28px 48px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .results-count {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .result-card:hover {
+            border-color: var(--orange);
+            box-shadow: 0 0 16px var(--orange-glow);
+        }
+
+        .result-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .result-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .tag.orange {
+            background: var(--orange-glow);
+            border-color: var(--orange-dim);
+            color: var(--orange);
+        }
+
+        .tag.green {
+            background: rgba(34, 197, 94, .1);
+            border-color: rgba(34, 197, 94, .3);
+            color: var(--green);
+        }
+
+        .tag.blue {
+            background: rgba(59, 130, 246, .1);
+            border-color: rgba(59, 130, 246, .3);
+            color: var(--blue);
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .result-btn {
+            padding: 6px 14px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: all .2s;
+        }
+
+        .result-btn:hover {
+            border-color: var(--orange);
+            color: var(--orange);
+        }
+
+        .result-btn.primary {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: #000;
+        }
+
+        .result-btn.primary:hover {
+            background: #ff8c2a;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 64px 0;
+            color: var(--text-muted);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 12px 28px;
+            border-bottom: 1px solid var(--border);
+            width: 100%;
+            transition: color .2s;
+        }
+
+        .back-link:hover {
+            color: var(--orange);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--orange);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+
+        <!-- Back link -->
+        <a href="/" class="back-link">← Back to Control Center</a>
+
+        <!-- Search hero -->
+        <div class="search-hero">
+            <h1>JNTU <span>Academic Search</span></h1>
+            <p>Search across all downloaded question papers, calendars, syllabus, and materials</p>
+
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="e.g. Mathematics, R23, 1-1, Academic Calendar…"
+                    autofocus>
+                <button id="search-btn">Search</button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <select id="f-university" class="filter-select">
+                    <option value="">All Universities</option>
+                    <option value="JNTUK">JNTUK</option>
+                    <option value="JNTUH">JNTUH</option>
+                    <option value="JNTUA">JNTUA</option>
+                    <option value="JNTUGV">JNTUGV</option>
+                </select>
+                <select id="f-category" class="filter-select">
+                    <option value="">All Categories</option>
+                    <option value="Question Papers">Question Papers</option>
+                    <option value="Academic Calendars">Academic Calendars</option>
+                    <option value="Syllabus">Syllabus</option>
+                    <option value="Time Tables">Time Tables</option>
+                    <option value="Materials">Materials</option>
+                    <option value="Notifications">Notifications</option>
+                </select>
+                <select id="f-regulation" class="filter-select">
+                    <option value="">All Regulations</option>
+                    <option value="R23">R23</option>
+                    <option value="R20">R20</option>
+                    <option value="R19">R19</option>
+                    <option value="R16">R16</option>
+                    <option value="R13">R13</option>
+                </select>
+                <select id="f-semester" class="filter-select">
+                    <option value="">All Semesters</option>
+                    <option value="1-1">1-1</option>
+                    <option value="1-2">1-2</option>
+                    <option value="2-1">2-1</option>
+                    <option value="2-2">2-2</option>
+                    <option value="3-1">3-1</option>
+                    <option value="3-2">3-2</option>
+                    <option value="4-1">4-1</option>
+                    <option value="4-2">4-2</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Results area -->
+        <div class="results-area">
+            <div id="results-header" class="results-header" style="display:none;">
+                <span class="results-count" id="results-count">0 results</span>
+            </div>
+            <div id="results-container">
+                <div class="empty-state">
+                    <div class="icon">🎓</div>
+                    <p>Enter a search term or select filters above to find academic files.</p>
+                    <p style="margin-top:6px;font-size:12px;">Run the scraper first to build your local repository.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        "use strict";
+
+        const $id = id => document.getElementById(id);
+
+        // Pre-populate search from URL param
+        const urlQ = new URLSearchParams(location.search).get("q") || "";
+        if (urlQ) { $id("search-input").value = urlQ; }
+
+        async function doSearch() {
+            const q = $id("search-input").value.trim();
+            const uni = $id("f-university").value;
+            const cat = $id("f-category").value;
+            const reg = $id("f-regulation").value;
+            const sem = $id("f-semester").value;
+
+            if (!q && !uni && !cat && !reg && !sem) return;
+
+            showLoading();
+
+            const params = new URLSearchParams();
+            if (q) params.set("q", q);
+            if (uni) params.set("university", uni);
+            if (cat) params.set("category", cat);
+            if (reg) params.set("regulation", reg);
+            if (sem) params.set("semester", sem);
+
+            try {
+                const res = await fetch("/api/search?" + params.toString());
+                const data = await res.json();
+                renderResults(data.results || [], data.count || 0);
+            } catch (e) {
+                renderError(String(e));
+            }
+        }
+
+        function showLoading() {
+            $id("results-container").innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Searching…</p>
+    </div>`;
+            $id("results-header").style.display = "none";
+        }
+
+        function renderResults(results, count) {
+            const header = $id("results-header");
+            const cont = $id("results-container");
+
+            header.style.display = "flex";
+            $id("results-count").textContent = `${count.toLocaleString()} result${count !== 1 ? "s" : ""}`;
+
+            if (!results.length) {
+                cont.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <p>No files found. Try running the scraper or adjusting your filters.</p>
+      </div>`;
+                return;
+            }
+
+            cont.innerHTML = '<div class="results-grid"></div>';
+            const grid = cont.querySelector(".results-grid");
+
+            for (const r of results) {
+                const card = document.createElement("div");
+                card.className = "result-card";
+
+                const localHref = r.local_path
+                    ? "/storage/" + r.local_path.replace(/\\/g, "/").split("/storage/")[1]
+                    : null;
+
+                card.innerHTML = `
+      <div class="result-title">${esc(r.title || r.subject || "Unknown")}</div>
+      <div class="result-meta">
+        ${r.university ? `<span class="tag orange">${esc(r.university)}</span>` : ""}
+        ${r.category ? `<span class="tag blue">${esc(r.category)}</span>` : ""}
+        ${r.degree ? `<span class="tag">${esc(r.degree)}</span>` : ""}
+        ${r.regulation ? `<span class="tag green">${esc(r.regulation)}</span>` : ""}
+        ${r.semester ? `<span class="tag">${esc(r.semester)}</span>` : ""}
+        ${r.exam_month ? `<span class="tag">${esc(r.exam_month)} ${esc(r.exam_year || "")}</span>` : ""}
+        ${r.size_human ? `<span class="tag">${esc(r.size_human)}</span>` : ""}
+      </div>
+      ${r.subject ? `<div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">${esc(r.subject)}</div>` : ""}
+      <div class="result-actions">
+        ${localHref
+                        ? `<a href="${localHref}" target="_blank" class="result-btn primary">⬇ Open PDF</a>`
+                        : `<span class="result-btn" style="opacity:.4;cursor:default">No local file</span>`}
+        ${r.pdf_url ? `<a href="${esc(r.pdf_url)}" target="_blank" class="result-btn">🔗 Source URL</a>` : ""}
+        ${r.file_page_url ? `<a href="${esc(r.file_page_url)}" target="_blank" class="result-btn">📄 File Page</a>` : ""}
+      </div>`;
+                grid.appendChild(card);
+            }
+        }
+
+        function renderError(msg) {
+            $id("results-container").innerHTML = `
+    <div class="empty-state">
+      <div class="icon">⚠</div>
+      <p style="color:var(--red)">${esc(msg)}</p>
+    </div>`;
+        }
+
+        function esc(s) {
+            if (s === undefined || s === null) return "";
+            return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Events
+        $id("search-btn").addEventListener("click", doSearch);
+        $id("search-input").addEventListener("keydown", e => { if (e.key === "Enter") doSearch(); });
+        ["f-university", "f-category", "f-regulation", "f-semester"].forEach(id => {
+            $id(id).addEventListener("change", doSearch);
+        });
+
+        // Auto-search if URL has ?q=
+        if (urlQ) doSearch();
+    </script>
+</body>
+
+</html>

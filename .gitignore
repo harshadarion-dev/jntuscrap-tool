@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.vscode/
+logs/
+.env
+
+# Exclude massive data folders
+storage/
+exports/
+raw_data/
